@@ -1,20 +1,9 @@
-<?php 
+<?php
 
 header("Access-Control-Allow-Origin: https://www.enermillpower.com");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Credentials: true");
-
-session_start();
-
-include "config.php";
-
-require 'PHPMailer/src/Exception.php';
-require 'PHPMailer/src/PHPMailer.php';
-require 'PHPMailer/src/SMTP.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -28,61 +17,55 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$fullname = $data['fullname'];
-$email = $data['email'];
-$phone = $data['phone'];
-$location = $data['location'];
-$message = $data['message'];
+$fullname = $data['fullname'] ?? '';
+$email = $data['email'] ?? '';
+$phone = $data['phone'] ?? '';
+$location = $data['location'] ?? '';
+$message = $data['message'] ?? '';
 
-if (empty($fullname) || empty($email) || empty($phone) || $location || $message){
+if (empty($fullname) || empty($email) || empty($phone) || empty($location) || empty($message)) {
     echo json_encode([
         'status' => 'error',
-        'message' => 'All field required'
+        'message' => 'All fields are required'
     ]);
     exit();
 }
 
-    
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
 
-// Retrieve the raw JSON data from the request body
-$inputData = file_get_contents("php://input");
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-// Decode the JSON data into a PHP associative array
-$data = json_decode($inputData, true);
-
-print_r($data);
-
-
-// SMTP Configuration
 $mail = new PHPMailer(true);
 
 try {
     $mail->isSMTP();
-    $mail->Host = 'cloud.webhostingbliss.com'; // Change this to your cPanel SMTP host
+    $mail->Host = 'cloud.webhostingbliss.com';
     $mail->SMTPAuth = true;
-    $mail->Username = 'contact@enermillpower.com'; // Your email address
-    $mail->Password = '@bWEEvN[LV@X[Wx7'; // Use App Password if 2FA is enabled
-    $mail->SMTPSecure = 'ssl'; // Use 'ssl' for port 465, 'tls' for port 587
-    $mail->Port = 465; // 465 for SSL, 587 for TLS
+    $mail->Username = 'contact@enermillpower.com';
+    $mail->Password = '@bWEEvN[LV@X[Wx7';
+    $mail->SMTPSecure = 'ssl';
+    $mail->Port = 465;
 
-    // Email Headers
-    $mail->setFrom('contact@enermillpower.com', 'Enermill Power Limited'); // Sender
-    $mail->addAddress('osemensilas@gmail.com'); // Recipient ndianaisang@gmail.com
+    $mail->setFrom('contact@enermillpower.com', 'Enermill Power Limited');
+    $mail->addAddress('osemensilas@gmail.com');
     $mail->Subject = 'Client From Enermill Power';
-    $mail->Body = "You have a new message from: $fullname\nPhone: $phone\nEmail: $email\nOrder Details: $order\nLocation: $location\nMessage: $message";
+    $mail->Body = 
+        "Name: $fullname\n" .
+        "Phone: $phone\n" .
+        "Email: $email\n" .
+        "Location: $location\n" .
+        "Message: $message";
 
-    // Send Mail
-    if ($mail->send()) {
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Message sent successfully'
-        ]);
-    } else {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Message not sent. Check connection'
-        ]);
-    }
+    $mail->send();
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Message sent successfully'
+    ]);
+
 } catch (Exception $e) {
     echo json_encode([
         'status' => 'error',
