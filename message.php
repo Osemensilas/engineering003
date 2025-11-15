@@ -8,6 +8,7 @@ header("Access-Control-Allow-Credentials: true");
 require __DIR__ . '/vendor/autoload.php';
 
 $enermillApi = "re_ZFP1s3yA_4RkXqGX6mVAq7jRDUQMjJsYx";
+$emailPassword = "Radio$1234";
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -27,7 +28,7 @@ $phone = $data['phone'] ?? '';
 $location = $data['location'] ?? '';
 $message = $data['message'] ?? '';
 
-if (empty($fullname) || empty($email) || empty($phone) || empty($location) || empty($message)) {
+if (empty($fullname) || empty($email) || empty($message)) {
     echo json_encode([
         'status' => 'error',
         'message' => 'All fields are required'
@@ -40,7 +41,7 @@ $resend = Resend::client($enermillApi);
 try {
     $resend->emails->send([
     'from' => 'Enermill <contact@enermillpower.com>',
-    'to' => ['osemensilas@gmail.com'],
+    'to' => ['osemensilas@gmail.com', 'enermillpower@gmail.com', 'osemen.dev@gmail.com'],
     'subject' => 'New Message from Enermill',
     'html' => '
                 <div style="padding:20px;background:#f5f7fa;font-family:Arial,Helvetica,sans-serif;color:#333;border-radius:10px;">
