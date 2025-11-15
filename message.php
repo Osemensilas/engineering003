@@ -39,7 +39,7 @@ $resend = Resend::client($enermillApi);
 
 try {
     $resend->emails->send([
-    'from' => 'Enermill <contact@enermill.com>',
+    'from' => 'Enermill <contact@enermillpower.com>',
     'to' => ['osemensilas@gmail.com'],
     'subject' => 'New Message from Enermill',
     'html' => '
